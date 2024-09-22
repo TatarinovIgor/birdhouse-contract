@@ -7,8 +7,12 @@ pub struct UpgradeableContract;
 #[contractimpl]
 impl UpgradeableContract {
 
-    pub fn version(env: Env) -> String {
+    pub fn version_build(env: Env) -> String {
         String::from_str(&env, "0.0.1")
+    }
+
+    pub fn version() -> i32 {
+        3
     }
 
     pub fn upgrade(env: Env, new_wasm_hash: BytesN<32>) {

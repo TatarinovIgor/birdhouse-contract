@@ -9,6 +9,7 @@ pub enum Error {
     NegativeAmount = 3,
 }
 
+/// Admin is an address that authorized to sign contract. Value is an Address
 pub(crate)const ADMIN: Symbol = symbol_short!("Admin");
 
 /// LastAsset is a name of last used asset for smart contract generation. Value is a Symbol
