@@ -1,0 +1,29 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+start
+partition "**Prepare-Smartcontract data" {
+:Generate asset name\n from OfferID;
+    :Create and Activate\nIssuing and Distributed\naccounts;
+    :Set Trust line for new asset\n from Issuer to Distribute;
+    :Set weight to 0 for\n Issuer account;
+    :Get smart contract\n for issued asset;
+}
+
+partition "**Master-Contract** Deploy" {
+    note
+        Input params
+        ----
+        - //OfferID//
+        - //RequestID//
+        - //Sponsor Account//
+        - //Initial issue Amount//
+    end note
+
+    :Save to Master-Contract\nmaping OfferID<->AssetCode;
+    :Mint initial amount and\nsave to Master-Contract\nRequestID and Amount;
+}
+
+stop
+
+@enduml
