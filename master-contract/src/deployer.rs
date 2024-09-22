@@ -32,7 +32,6 @@ pub struct Deployer;
 impl Deployer {
     pub fn deploy(
         env: Env,
-        deployer: Address,
         order: String,
         issuer: String,
         prefix: String,

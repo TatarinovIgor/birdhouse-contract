@@ -1,4 +1,4 @@
-use soroban_sdk::{contract, contractclient, contractimpl, contracttype, Address, Env, IntoVal};
+use soroban_sdk::{contract, contractclient, contractimpl, Address, Env};
 use crate::error::{Error};
 use crate::store::{ADMIN};
 
@@ -10,19 +10,6 @@ trait MintInterface {
 
 #[contract]
 pub struct Minter;
-
-#[contracttype]
-#[derive(Debug, Clone, Eq, PartialEq)]
-pub struct MinterConfig {
-    limit: i128,
-    epoch_length: u32,
-}
-
-#[contracttype]
-#[derive(Debug, Default, Clone, Eq, PartialEq)]
-pub struct MinterStats {
-    consumed_limit: i128,
-}
 
 #[contractimpl]
 impl Minter {
@@ -40,18 +27,30 @@ impl Minter {
         env.storage().persistent().get(&ADMIN).unwrap()
     }
 
+    /// Set the admin.
+    pub fn set_admin(env: Env, new_admin: Address) {
+        if let Some(admin) = env
+            .storage()
+            .instance()
+            .get::<_, Address>(&ADMIN)
+        {
+            admin.require_auth();
+        };
+        env.storage().instance().set(&ADMIN, &new_admin);
+    }
+
     /// Calls the 'mint' function of the 'contract' with 'to' and 'amount'.
     /// Authorized by the 'minter'. Uses some of the authorized 'minter's
     /// current epoch's limit.
     pub fn mint(
         env: Env,
         contract: Address,
-        minter: Address,
         to: Address,
         amount: i128,
     ) -> Result<(), Error> {
-        // Verify minter is authenticated, and authorizing args.
-        minter.require_auth_for_args((&contract, &to, amount).into_val(&env));
+
+        let admin: Address = env.storage().persistent().get(&ADMIN).unwrap();
+        admin.require_auth();
 
         // Verify amount is positive.
         if amount < 0 {
