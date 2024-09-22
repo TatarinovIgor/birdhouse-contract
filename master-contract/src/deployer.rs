@@ -1,29 +1,7 @@
-use soroban_sdk::{contract, contractimpl, Env, String, Address, contracttype, Val, EnvBase, Bytes};
+use soroban_sdk::{contract, contractimpl, Env, String, Address, Val, EnvBase, Bytes};
 use soroban_sdk::unwrap::UnwrapOptimized;
 use crate::serialize_xdr::{CPAsset, CPWriteXdr};
-use crate::store::{StorageKey, ADMIN, LAST_ASSET};
-
-#[contracttype]
-#[derive(Debug, Clone, Eq, PartialEq)]
-pub struct OrderInfo {
-    contract: Address,
-    code: String,
-    issuer: Address,
-}
-
-#[contracttype]
-#[derive(Debug, Clone, Eq, PartialEq)]
-pub struct PaymentInfo {
-    payment: String,
-    amount: i128,
-}
-
-#[contracttype]
-#[derive(Debug, Clone, Eq, PartialEq)]
-pub struct AssetInfo {
-    order: String,
-    payments: Option<PaymentInfo>,
-}
+use crate::store::{AssetInfo, OrderInfo, StorageKey, ADMIN, LAST_ASSET};
 
 #[contract]
 pub struct Deployer;
@@ -36,7 +14,6 @@ impl Deployer {
         issuer: String,
         prefix: String,
     ) -> (Address, String, Address) {
-
         let admin: Address = env.storage().persistent().get(&ADMIN).unwrap();
         admin.require_auth();
 
@@ -98,12 +75,6 @@ impl Deployer {
             issuer: Address::from_string(&issuer),
         };
         env.storage().persistent().set(&StorageKey::Order(order.clone()), order_key);
-        // store asset information
-        let asset_key = &AssetInfo {
-            order: order.clone(),
-            payments: None,
-        };
-
 
         // store last asset used
         let code_last = core::str::from_utf8(
@@ -112,6 +83,12 @@ impl Deployer {
             .unwrap();
         let code_symbol = String::from_str(&env, code_last);
         env.storage().persistent().set(&LAST_ASSET, &code_symbol);
+
+        // store asset information
+        let asset_key = &AssetInfo {
+            order: order.clone(),
+            payments: None,
+        };
 
         env.storage().persistent().set(&StorageKey::Asset(
             order_key.code.clone(), order_key.issuer.clone()), asset_key);
