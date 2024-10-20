@@ -1,12 +1,10 @@
-use soroban_sdk::{contract, contractimpl, Env, String, Address, Val, EnvBase, Bytes};
+use soroban_sdk::{Env, String, Address, Val, EnvBase, Bytes};
 use soroban_sdk::unwrap::UnwrapOptimized;
 use crate::serialize_xdr::{CPAsset, CPWriteXdr};
 use crate::store::{AssetInfo, OrderInfo, StorageKey, ADMIN, LAST_ASSET};
 
-#[contract]
 pub struct Deployer;
 
-#[contractimpl]
 impl Deployer {
     pub fn deploy(
         env: Env,

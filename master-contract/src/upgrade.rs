@@ -1,10 +1,8 @@
-use soroban_sdk::{contractimpl, BytesN, Env, contract, Address, String};
+use soroban_sdk::{BytesN, Env, Address, String};
 use crate::store::{ADMIN};
 
-#[contract]
 pub struct UpgradeableContract;
 
-#[contractimpl]
 impl UpgradeableContract {
 
     pub fn version_build(env: Env) -> String {

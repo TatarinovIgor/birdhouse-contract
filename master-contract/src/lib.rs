@@ -7,4 +7,7 @@ mod minting;
 mod serialize_xdr;
 mod store;
 mod upgrade;
+mod contract;
+mod payer;
+mod admin;
 

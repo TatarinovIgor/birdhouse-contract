@@ -44,4 +44,6 @@ pub enum StorageKey {
     Order(String),
     /// Asset is an asset that was issued by this smart contract. Value is AssetInfo
     Asset(String, Address),
+    /// Payer is an id of user that do payment and receive confirmation as issued assets. Value is Address
+    Payer(String),
 }

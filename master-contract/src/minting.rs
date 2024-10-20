@@ -1,4 +1,4 @@
-use soroban_sdk::{contract, contractclient, contractimpl, vec, Address, Env, String};
+use soroban_sdk::{contractclient, vec, Address, Env, String};
 use crate::error::{Error};
 use crate::store::{AssetInfo, OrderInfo, PaymentInfo, StorageKey, ADMIN};
 
@@ -8,36 +8,9 @@ trait MintInterface {
     fn mint(env: Env, to: Address, amount: i128);
 }
 
-#[contract]
 pub struct Minter;
 
-#[contractimpl]
 impl Minter {
-
-    pub fn init(e: Env, admin: Address) -> Result<(), crate::store::Error> {
-        if e.storage().persistent().has(&ADMIN) {
-            return Err(crate::store::Error::AlreadyInitialized);
-        }
-        e.storage().persistent().set(&ADMIN, &admin);
-        Ok(())
-    }
-
-    /// Return the admin address.
-    pub fn admin(env: Env) -> Address {
-        env.storage().persistent().get(&ADMIN).unwrap()
-    }
-
-    /// Set the admin.
-    pub fn set_admin(env: Env, new_admin: Address) {
-        if let Some(admin) = env
-            .storage()
-            .instance()
-            .get::<_, Address>(&ADMIN)
-        {
-            admin.require_auth();
-        };
-        env.storage().instance().set(&ADMIN, &new_admin);
-    }
 
     /// Calls the 'mint' function of the 'contract' with 'to' and 'amount'.
     pub fn mint(
