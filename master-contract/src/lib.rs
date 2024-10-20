@@ -10,4 +10,5 @@ mod upgrade;
 mod contract;
 mod payer;
 mod admin;
+mod auth;
 
