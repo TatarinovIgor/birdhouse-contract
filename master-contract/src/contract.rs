@@ -6,6 +6,7 @@ use crate::minting::Minter;
 use crate::payer::Payer;
 use crate::upgrade::UpgradeableContract;
 use crate::store::ADMIN;
+use crate::transfer::Transfer;
 
 #[contract]
 pub struct PaymentContract;
@@ -29,10 +30,19 @@ impl PaymentContract {
         env: Env,
         order: String,
         payment: String,
-        to: Address,
+        payer: String,
         amount: i128,
     ) -> Result<(), Error> {
-        Minter::mint(env, order, payment, to, amount)
+        Minter::mint(env, order, payment, payer, amount)
+    }
+    pub fn transfer(
+        env: Env,
+        order: String,
+        transfer: String,
+        beneficiary: String,
+        amount: i128,
+    ) -> Result<(), Error> {
+        Transfer::transfer(env, order, transfer, beneficiary, amount)
     }
     pub fn payer(env: Env, id: String) -> Address {
         Payer::payer(env, id)
@@ -46,10 +56,11 @@ impl PaymentContract {
     pub fn deploy(
         env: Env,
         order: String,
+        payer: String,
         issuer: String,
         prefix: String,
     ) -> (Address, String, Address) {
-        Deployer::deploy(env, order, issuer, prefix)
+        Deployer::deploy(env, order, payer, issuer, prefix)
     }
     pub fn version_build(env: Env) -> String {
         UpgradeableContract::version_build(env)

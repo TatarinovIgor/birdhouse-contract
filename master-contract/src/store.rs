@@ -29,13 +29,25 @@ pub struct OrderInfo {
 pub struct PaymentInfo {
     pub(crate) payment: String,
     pub(crate) amount: i128,
+    pub(crate) date:  Option<u64>,
+}
+
+#[contracttype]
+#[derive(Debug, Clone, Eq, PartialEq)]
+pub struct TransferInfo {
+    pub(crate) transfer: String,
+    pub(crate) beneficiary: String,
+    pub(crate) amount: i128,
+    pub(crate) date: Option<u64>,
 }
 
 #[contracttype]
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct AssetInfo {
     pub(crate) order: String,
+    pub(crate) payer: Option<String>,
     pub(crate) payments: Option<Vec<PaymentInfo>>,
+    pub(crate) transfers: Option<Vec<TransferInfo>>,
 }
 
 #[contracttype]

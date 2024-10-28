@@ -1,27 +1,19 @@
-use soroban_sdk::{contractclient, vec, Address, Env, String};
-use crate::error::{Error};
+use soroban_sdk::{vec, Address, Env, String};
+use crate::error::Error;
+use crate::minting::MintClient;
 use crate::payer::Payer;
-use crate::store::{AssetInfo, OrderInfo, PaymentInfo, StorageKey, ADMIN};
+use crate::store::{AssetInfo, OrderInfo, StorageKey, TransferInfo, ADMIN};
 
+pub struct Transfer;
 
-#[contractclient(name = "MintClient")]
-trait MintInterface {
-    fn mint(env: Env, to: Address, amount: i128);
-    fn set_admin(env: Env, new_admin: Address);
-    fn clawback(env: Env, from: Address, amount: i128);
-    fn set_authorized(env: Env, id: &Address, authorize: &bool);
-}
+impl Transfer {
 
-pub struct Minter;
-
-impl Minter {
-
-    /// Calls the 'mint' function of the 'contract' with 'to' and 'amount'.
-    pub fn mint(
+    /// Calls the 'transfer' function of the 'contract' with 'to' and 'amount'.
+    pub fn transfer(
         env: Env,
         order: String,
-        payment: String,
-        payer: String,
+        transfer: String,
+        beneficiary: String,
         amount: i128,
     ) -> Result<(), Error> {
 
@@ -42,19 +34,27 @@ impl Minter {
             .unwrap();
 
         let date = Option::from(env.ledger().timestamp());
+        let b = beneficiary.clone();
+
         // Update information about payment operations
-        if asset_info.payments == None {
-            let create_payment = vec!(&env, PaymentInfo{payment, amount, date});
-            asset_info.payments = Option::from(create_payment);
+        if asset_info.transfers == None {
+            let create_transfer = vec!(&env,
+                                       TransferInfo{transfer, beneficiary, amount, date});
+            asset_info.transfers = Option::from(create_transfer);
         } else {
-            let mut recorded_payments = asset_info.payments.unwrap();
-            recorded_payments.push_back(PaymentInfo{payment, amount, date });
-            asset_info.payments = Option::from(recorded_payments);
+            let mut recorded_transfers = asset_info.transfers.unwrap();
+            recorded_transfers.push_back(TransferInfo{transfer, beneficiary, amount, date });
+            asset_info.transfers = Option::from(recorded_transfers);
         }
-        // Get address for payer
-        let to = Payer::payer(env.clone(), payer);
-        // Perform the mint.
+
         let client = MintClient::new(&env, &order_info.contract);
+        // Burn asset
+        let from = Payer::payer(env.clone(), asset_info.clone().payer.unwrap());
+        client.clawback(&from, &amount);
+
+        // Perform the mint.
+        // Get address for payer
+        let to = Payer::payer(env.clone(), b);
         client.mint(&to, &amount);
 
         // Store information about payment operations

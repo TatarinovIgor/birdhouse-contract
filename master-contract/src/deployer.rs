@@ -9,6 +9,7 @@ impl Deployer {
     pub fn deploy(
         env: Env,
         order: String,
+        payer: String,
         issuer: String,
         prefix: String,
     ) -> (Address, String, Address) {
@@ -85,7 +86,9 @@ impl Deployer {
         // store asset information
         let asset_key = &AssetInfo {
             order: order.clone(),
+            payer: Option::from(payer.clone()),
             payments: None,
+            transfers: None,
         };
 
         env.storage().persistent().set(&StorageKey::Asset(
