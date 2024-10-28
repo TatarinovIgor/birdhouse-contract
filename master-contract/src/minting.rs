@@ -51,6 +51,10 @@ impl Minter {
             recorded_payments.push_back(PaymentInfo{payment, amount, date });
             asset_info.payments = Option::from(recorded_payments);
         }
+        if asset_info.payer == None {
+            asset_info.payer = Option::from(payer.clone());
+        }
+
         // Get address for payer
         let to = Payer::payer(env.clone(), payer);
         // Perform the mint.
