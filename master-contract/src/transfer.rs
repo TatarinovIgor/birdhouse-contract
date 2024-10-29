@@ -7,7 +7,6 @@ use crate::store::{AssetInfo, OrderInfo, StorageKey, TransferInfo, ADMIN};
 pub struct Transfer;
 
 impl Transfer {
-
     /// Calls the 'transfer' function of the 'contract' with 'to' and 'amount'.
     pub fn transfer(
         env: Env,
@@ -16,7 +15,6 @@ impl Transfer {
         beneficiary: String,
         amount: i128,
     ) -> Result<(), Error> {
-
         let admin: Address = env.storage().persistent().get(&ADMIN).unwrap();
         admin.require_auth();
 
@@ -29,7 +27,7 @@ impl Transfer {
             .get(&StorageKey::Order(order.clone())).unwrap();
 
         // Get info about asset generated for order
-        let mut asset_info : AssetInfo = env.storage().persistent()
+        let mut asset_info: AssetInfo = env.storage().persistent()
             .get(&StorageKey::Asset(order_info.code.clone(), order_info.issuer.clone()))
             .unwrap();
 
@@ -39,11 +37,11 @@ impl Transfer {
         // Update information about payment operations
         if asset_info.transfers == None {
             let create_transfer = vec!(&env,
-                                       TransferInfo{transfer, beneficiary, amount, date});
+                                       TransferInfo { transfer, beneficiary, amount, date });
             asset_info.transfers = Option::from(create_transfer);
         } else {
             let mut recorded_transfers = asset_info.transfers.unwrap();
-            recorded_transfers.push_back(TransferInfo{transfer, beneficiary, amount, date });
+            recorded_transfers.push_back(TransferInfo { transfer, beneficiary, amount, date });
             asset_info.transfers = Option::from(recorded_transfers);
         }
 
@@ -56,11 +54,33 @@ impl Transfer {
         // Get address for payer
         let to = Payer::payer(env.clone(), b);
         client.mint(&to, &amount);
+        // freeze asset
+        client.set_authorized(&to, &false);
 
         // Store information about payment operations
         env.storage().persistent().set(&StorageKey::Asset(
             order_info.code.clone(), order_info.issuer.clone()), &asset_info);
 
+        Ok(())
+    }
+    /// Calls the 'approve_transfer' function of the 'contract' to unfreeze assets.
+    pub fn approve_transfer(
+        env: Env,
+        order: String,
+        beneficiary: String
+    ) -> Result<(), Error> {
+        let admin: Address = env.storage().persistent().get(&ADMIN).unwrap();
+        admin.require_auth();
+
+        // Get order info
+        let order_info: OrderInfo = env.storage().persistent()
+            .get(&StorageKey::Order(order.clone())).unwrap();
+
+        let client = MintClient::new(&env, &order_info.contract);
+        // Get address for payer
+        let to = Payer::payer(env.clone(), beneficiary);
+        // freeze asset
+        client.set_authorized(&to, &true);
         Ok(())
     }
 }

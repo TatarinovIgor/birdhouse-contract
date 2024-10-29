@@ -43,6 +43,7 @@ impl Minter {
 
         let date = Option::from(env.ledger().timestamp());
         // Update information about payment operations
+
         if asset_info.payments == None {
             let create_payment = vec!(&env, PaymentInfo{payment, amount, date});
             asset_info.payments = Option::from(create_payment);
@@ -51,6 +52,8 @@ impl Minter {
             recorded_payments.push_back(PaymentInfo{payment, amount, date });
             asset_info.payments = Option::from(recorded_payments);
         }
+
+
         if asset_info.payer == None {
             asset_info.payer = Option::from(payer.clone());
         }

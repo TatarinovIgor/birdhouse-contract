@@ -44,6 +44,13 @@ impl PaymentContract {
     ) -> Result<(), Error> {
         Transfer::transfer(env, order, transfer, beneficiary, amount)
     }
+    pub fn approve_transfer(
+        env: Env,
+        order: String,
+        beneficiary: String
+    ) -> Result<(), Error> {
+        Transfer::approve_transfer(env, order, beneficiary)
+    }
     pub fn payer(env: Env, id: String) -> Address {
         Payer::payer(env, id)
     }
