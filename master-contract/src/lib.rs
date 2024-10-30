@@ -12,4 +12,5 @@ mod payer;
 mod admin;
 mod auth;
 mod transfer;
+mod burn;
 

@@ -10,7 +10,7 @@ pub enum Error {
 }
 
 /// Admin is an address that authorized to sign contract. Value is an Address
-pub(crate)const ADMIN: Symbol = symbol_short!("Admin");
+pub(crate) const ADMIN: Symbol = symbol_short!("Admin");
 
 /// LastAsset is a name of last used asset for smart contract generation. Value is a Symbol
 pub(crate) const LAST_ASSET: Symbol = symbol_short!("LastAsset");
@@ -29,7 +29,7 @@ pub struct OrderInfo {
 pub struct PaymentInfo {
     pub(crate) payment: String,
     pub(crate) amount: i128,
-    pub(crate) date:  Option<u64>,
+    pub(crate) date: Option<u64>,
 }
 
 #[contracttype]
@@ -48,6 +48,7 @@ pub struct AssetInfo {
     pub(crate) payer: Option<String>,
     pub(crate) payments: Option<Vec<PaymentInfo>>,
     pub(crate) transfers: Option<Vec<TransferInfo>>,
+    pub(crate) cash_out: Option<Vec<TransferInfo>>,
 }
 
 #[contracttype]

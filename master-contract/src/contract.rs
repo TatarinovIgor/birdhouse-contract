@@ -1,5 +1,6 @@
 use soroban_sdk::{contract, contractimpl, Address, BytesN, Env, String};
 use crate::admin::Admin;
+use crate::burn::Burn;
 use crate::deployer::Deployer;
 use crate::error::{Error};
 use crate::minting::Minter;
@@ -26,6 +27,15 @@ impl PaymentContract {
     pub fn set_admin(env: Env, new_admin: Address) {
         Admin::set_admin(env, new_admin)
     }
+    pub fn deploy(
+        env: Env,
+        order: String,
+        payer: String,
+        issuer: String,
+        prefix: String,
+    ) -> (Address, String, Address) {
+        Deployer::deploy(env, order, payer, issuer, prefix)
+    }
     pub fn mint(
         env: Env,
         order: String,
@@ -47,9 +57,19 @@ impl PaymentContract {
     pub fn approve_transfer(
         env: Env,
         order: String,
-        beneficiary: String
+        beneficiary: String,
     ) -> Result<(), Error> {
         Transfer::approve_transfer(env, order, beneficiary)
+    }
+    pub fn burn(
+        env: Env,
+        code: String,
+        issuer: Address,
+        payout: String,
+        from: String,
+        amount: i128,
+    ) -> Result<(), Error> {
+        Burn::burn(env, code, issuer, payout, from, amount)
     }
     pub fn payer(env: Env, id: String) -> Address {
         Payer::payer(env, id)
@@ -60,15 +80,7 @@ impl PaymentContract {
     pub fn remove_payer(env: Env, id: String) {
         Payer::remove_payer(env, id)
     }
-    pub fn deploy(
-        env: Env,
-        order: String,
-        payer: String,
-        issuer: String,
-        prefix: String,
-    ) -> (Address, String, Address) {
-        Deployer::deploy(env, order, payer, issuer, prefix)
-    }
+
     pub fn version_build(env: Env) -> String {
         UpgradeableContract::version_build(env)
     }
@@ -78,5 +90,4 @@ impl PaymentContract {
     pub fn upgrade(env: Env, new_wasm_hash: BytesN<32>) {
         UpgradeableContract::upgrade(env, new_wasm_hash)
     }
-
 }
