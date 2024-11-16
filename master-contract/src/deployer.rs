@@ -87,9 +87,6 @@ impl Deployer {
         let asset_key = &AssetInfo {
             order: order.clone(),
             payer: Option::from(payer.clone()),
-            payments: None,
-            transfers: None,
-            cash_out: None,
         };
 
         env.storage().persistent().set(&StorageKey::Asset(

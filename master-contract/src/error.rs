@@ -4,13 +4,15 @@ use soroban_sdk::contracterror;
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 #[repr(u32)]
 pub enum Error {
-    NotAuthorizedMinter = 1,
-    DailyLimitInsufficient = 2,
-    NegativeAmount = 3,
-    BadSignatureOrder = 4,
-    NotEnoughSigners = 5,
-    InvalidContext = 6,
-    BadArgs = 7,
-    NotInitialized = 8,
-    UnknownSigner = 9,
+    AlreadyInitialized = 1,
+    NotAuthorizedMinter = 2,
+    DailyLimitInsufficient = 3,
+    NegativeAmount = 4,
+    BadSignatureOrder = 5,
+    NotEnoughSigners = 6,
+    InvalidContext = 7,
+    BadArgs = 8,
+    NotInitialized = 9,
+    UnknownSigner = 10,
+    IncorrectTransfer = 11,
 }
