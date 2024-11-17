@@ -12,12 +12,12 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-soroban-sdk = { version = "21.7.7", default-features = false, features = ["alloc"]   }
-soroban-token-sdk = { version = "21.7.7", default-features = false  }
+soroban-sdk = { version = "22.0.0-rc.3.2", default-features = false, features = ["alloc"]   }
+soroban-token-sdk = { version = "22.0.0-rc.3.2", default-features = false  }
 log = "0.4.22"
 base32 = { version = "0.5.1" }
 [dev-dependencies]
-soroban-sdk = { version = "21.0.0", features = ["testutils"] }
+soroban-sdk = { version = "22.0.0-rc.3.2", features = ["testutils"] }
 
 [workspace.dependencies]
 base32 = "0.5.1"

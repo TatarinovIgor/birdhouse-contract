@@ -15,6 +15,9 @@ pub struct PaymentContract;
 
 #[contractimpl]
 impl PaymentContract {
+    pub fn __constructor(e: Env, admin: Address, pay_asset: String) {
+        let _ = Self::init(e, admin, pay_asset).expect("can't initialize smart contract");
+    }
     pub fn init(e: Env, admin: Address, pay_asset: String) -> Result<(), Error> {
         if e.storage().persistent().has(&ADMIN) {
             return Err(Error::AlreadyInitialized);

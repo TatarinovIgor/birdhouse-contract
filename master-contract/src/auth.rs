@@ -115,6 +115,7 @@ fn verify_authorization_policy(
             c
         }
         Context::CreateContractHostFn(_) => return Err(Error::InvalidContext),
+        _ => return Err(Error::InvalidContext)
     };
     // For the account control every signer must sign the invocation.
 
