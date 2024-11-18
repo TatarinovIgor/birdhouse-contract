@@ -81,16 +81,16 @@ impl PaymentContract {
     pub fn approve_transfer(
         env: Env,
         order: String,
-        beneficiary: String,
+        transfer: String,
     ) -> Result<(), Error> {
-        Transfer::approve_transfer(env, order, beneficiary)
+        Transfer::approve_transfer(env, order, transfer)
     }
     pub fn reject_transfer(
         env: Env,
         order: String,
-        beneficiary: String,
+        transfer: String,
     ) -> Result<(), Error> {
-        Transfer::reject_transfer(env, order, beneficiary)
+        Transfer::reject_transfer(env, order, transfer)
     }
     pub fn burn(
         env: Env,

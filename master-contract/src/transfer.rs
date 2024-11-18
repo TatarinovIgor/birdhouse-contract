@@ -142,7 +142,6 @@ impl Transfer {
         let client_payout = MintClient::new(&env, &pay_asset.contract);
         client_payout.mint(&beneficiary, &amount);
 
-
         Ok(())
     }
 
@@ -193,7 +192,7 @@ impl Transfer {
         let client = MintClient::new(&env, &order_info.contract);
 
         // remove asset from beneficiary
-        let beneficiary = Payer::payer(env.clone(), rejected_transfer.beneficiary);
+        let beneficiary = Payer::payer(env.clone(), rejected_transfer.clone().beneficiary);
         client.clawback(&beneficiary, &rejected_transfer.amount);
 
         // back asset to payer
