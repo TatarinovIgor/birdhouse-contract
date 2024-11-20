@@ -63,8 +63,6 @@ impl Transfer {
         // Get address for payer
         let to = Payer::payer(env.clone(), b);
         client.mint(&to, &amount);
-        // freeze asset
-        client.set_authorized(&to, &false);
 
         // Store information about payment operations
         env.storage().persistent().set(&StorageKey::Asset(
