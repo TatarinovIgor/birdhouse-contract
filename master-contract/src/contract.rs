@@ -15,6 +15,8 @@ pub struct PaymentContract;
 
 #[contractimpl]
 impl PaymentContract {
+
+    /// Constructor requires Admin address and asset code for payout asset
     pub fn __constructor(e: Env, admin: Address, pay_asset: String) {
         let _ = Self::init(e, admin, pay_asset).expect("can't initialize smart contract");
     }
@@ -45,12 +47,18 @@ impl PaymentContract {
 
         Ok(())
     }
+
+    /// Get admin address
     pub fn admin(env: Env) -> Address {
         Admin::admin(env)
     }
+
+    /// Set new admin address
     pub fn set_admin(env: Env, new_admin: Address) {
         Admin::set_admin(env, new_admin)
     }
+
+    /// Issue asset for the order
     pub fn deploy(
         env: Env,
         order: String,
@@ -60,6 +68,8 @@ impl PaymentContract {
     ) -> (Address, String, Address) {
         Deployer::deploy(env, order, payer, issuer, prefix)
     }
+
+    /// Mint asset for the paid order
     pub fn mint(
         env: Env,
         order: String,
@@ -69,6 +79,8 @@ impl PaymentContract {
     ) -> Result<(), Error> {
         Minter::mint(env, order, payment, payer, amount)
     }
+
+    /// Transfer order asset as a payment to beneficiary
     pub fn transfer(
         env: Env,
         order: String,
@@ -78,6 +90,9 @@ impl PaymentContract {
     ) -> Result<(), Error> {
         Transfer::transfer(env, order, transfer, beneficiary, amount)
     }
+
+    /// Approve order asset transfer
+    /// will do exchange order asset to pay out asset
     pub fn approve_transfer(
         env: Env,
         order: String,
@@ -85,6 +100,9 @@ impl PaymentContract {
     ) -> Result<(), Error> {
         Transfer::approve_transfer(env, order, transfer)
     }
+
+    /// Reject order asset transfer
+    /// will do revert order asset to the order payer
     pub fn reject_transfer(
         env: Env,
         order: String,
@@ -92,6 +110,8 @@ impl PaymentContract {
     ) -> Result<(), Error> {
         Transfer::reject_transfer(env, order, transfer)
     }
+
+    /// Burn order asset
     pub fn burn(
         env: Env,
         code: String,
@@ -101,12 +121,18 @@ impl PaymentContract {
     ) -> Result<(), Error> {
         Burn::burn(env, code, issuer, payout, amount)
     }
+
+    /// Get payer address by ID
     pub fn payer(env: Env, id: String) -> Address {
         Payer::payer(env, id)
     }
+
+    /// Add payer address by ID
     pub fn add_payer(env: Env, id: String, address: Address) {
         Payer::add_payer(env, id, address)
     }
+
+    /// Remove payer address by ID
     pub fn remove_payer(env: Env, id: String) {
         Payer::remove_payer(env, id)
     }
@@ -117,6 +143,8 @@ impl PaymentContract {
     pub fn version() -> i32 {
         UpgradeableContract::version()
     }
+
+    /// Upgrade smart contract
     pub fn upgrade(env: Env, new_wasm_hash: BytesN<32>) {
         UpgradeableContract::upgrade(env, new_wasm_hash)
     }

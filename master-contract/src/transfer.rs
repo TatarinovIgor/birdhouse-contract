@@ -8,6 +8,7 @@ use crate::store::StorageKey::{Payouts, Transfers};
 pub struct Transfer;
 
 impl Transfer {
+
     /// Calls the 'transfer' function of the 'contract' with 'to' and 'amount'.
     pub fn transfer(
         env: Env,
@@ -70,6 +71,7 @@ impl Transfer {
 
         Ok(())
     }
+
     /// Calls the 'approve_transfer' function of the 'contract' to unfreeze assets.
     pub fn approve_transfer(
         env: Env,
