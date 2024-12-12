@@ -2,7 +2,8 @@ use crate::store::StorageKey::{Media, MediaBlock};
 use crate::store::{
     MediaInfo, MediaType, ADMIN, AMOUNT, DESCRIPTION, ID, MEDIA_LIST, NAME, PRICE, TOML,
 };
-use soroban_sdk::{contract, contractimpl, vec, Address, Env, String, Vec};
+use crate::upgrade::UpgradeableContract;
+use soroban_sdk::{contract, contractimpl, vec, Address, BytesN, Env, String, Vec};
 
 /// Admin
 /// Partner
@@ -126,7 +127,7 @@ impl GoodsContract {
                 let mut media_list: Vec<String> =
                     env.storage().persistent().get(&MEDIA_LIST).unwrap();
                 let index = media_list.first_index_of(&media_id);
-                if !index.clone().is_none(){
+                if !index.clone().is_none() {
                     media_list.remove(index.unwrap());
                 }
                 env.storage().persistent().set(&MEDIA_LIST, &media_list);
@@ -138,5 +139,19 @@ impl GoodsContract {
     pub fn set_toml_file(env: Env, toml_file_link: String) {
         Self::authorize_admin(&env);
         env.storage().persistent().set(&TOML, &toml_file_link)
+    }
+
+    /// return version description
+    pub fn version_build(env: Env) -> String {
+        UpgradeableContract::version_build(env)
+    }
+    /// return timestemp of the build
+    pub fn version() -> i32 {
+        UpgradeableContract::version()
+    }
+
+    /// Upgrade smart contract
+    pub fn upgrade(env: Env, new_wasm_hash: BytesN<32>) {
+        UpgradeableContract::upgrade(env, new_wasm_hash)
     }
 }
