@@ -1,6 +1,8 @@
 use crate::store::StorageKey::{Media, MediaBlock};
-use crate::store::{MediaInfo, MediaType, ADMIN, AMOUNT, DESCRIPTION, ID, NAME, PRICE, TOML};
-use soroban_sdk::{contract, contractimpl, Address, Env, String};
+use crate::store::{
+    MediaInfo, MediaType, ADMIN, AMOUNT, DESCRIPTION, ID, MEDIA_LIST, NAME, PRICE, TOML,
+};
+use soroban_sdk::{contract, contractimpl, vec, Address, Env, String, Vec};
 
 /// Admin
 /// Partner
@@ -80,6 +82,14 @@ impl GoodsContract {
         total_blocks: u64,
     ) {
         Self::authorize_admin(&env);
+        if env.storage().persistent().has(&MEDIA_LIST) {
+            let mut media_list: Vec<String> = env.storage().persistent().get(&MEDIA_LIST).unwrap();
+            media_list.push_back(media_id.clone());
+            env.storage().persistent().set(&MEDIA_LIST, &media_list);
+        } else {
+            let media_list: Vec<String> = vec![&env, media_id.clone()];
+            env.storage().persistent().set(&MEDIA_LIST, &media_list);
+        }
         let media_info = MediaInfo {
             media_id: media_id.clone(),
             media_type,
@@ -112,6 +122,16 @@ impl GoodsContract {
             for block in 1..=media_info.total_blocks {
                 Self::remove_media_block(env.clone(), media_id.clone(), block);
             }
+            if env.storage().persistent().has(&MEDIA_LIST) {
+                let mut media_list: Vec<String> =
+                    env.storage().persistent().get(&MEDIA_LIST).unwrap();
+                let index = media_list.first_index_of(&media_id);
+                if !index.clone().is_none(){
+                    media_list.remove(index.unwrap());
+                }
+                env.storage().persistent().set(&MEDIA_LIST, &media_list);
+            }
+            env.storage().persistent().remove(&Media(media_id.clone()));
         }
     }
 
@@ -119,5 +139,4 @@ impl GoodsContract {
         Self::authorize_admin(&env);
         env.storage().persistent().set(&TOML, &toml_file_link)
     }
-
 }

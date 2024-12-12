@@ -26,6 +26,9 @@ pub(crate) const PRICE: Symbol = symbol_short!("Price");
 /// Amount is a current available amount of goods. Value is an i64
 pub(crate) const AMOUNT: Symbol = symbol_short!("Amount");
 
+/// MediaList is a list of media_id added to the smart contract. Value is an array of string
+pub(crate) const MEDIA_LIST: Symbol = symbol_short!("MediaList");
+
 /// Toml is representation of toml file link. Value is String.
 pub(crate) const TOML: Symbol = symbol_short!("toml");
 
