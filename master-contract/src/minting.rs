@@ -27,7 +27,7 @@ impl Minter {
         admin.require_auth();
 
         // Verify amount is positive.
-        if amount < 0 {
+        if amount <= 0 {
             return Err(Error::NegativeAmount);
         }
         // Get order info

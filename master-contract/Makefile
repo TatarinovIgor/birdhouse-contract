@@ -25,7 +25,7 @@ upgrade: build
 	$(eval INSTALL_HASH := $(shell stellar contract install -q --network $(STELLAR_NETWORK) \
  			 --wasm .\target\wasm32-unknown-unknown\release\master_contract.optimized.wasm \
 			 --source-account "$(SPONSOR_SEED)"))
-	@echo "Filename: $(INSTALL_HASH)"
+	@echo "Install hash: $(INSTALL_HASH)"
 	stellar contract invoke  --network $(STELLAR_NETWORK)  --source-account $(ADMIN_SEED) \
 			 --id $(UPGRADE_CONTRACT) \
  		 	 -- upgrade --new_wasm_hash $(INSTALL_HASH)

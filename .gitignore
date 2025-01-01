@@ -1,2 +1,10 @@
 /goods-contract/target/
 /master-contract/target/
+/demand-contract/target/
+/deal-contract/target/
+/product-contract/target/
+/service-contract/target/
+
+/uml/CRL_C4_level1.puml
+/uml/CRL_C4_level2.puml
+/uml/CRL_sequence.puml

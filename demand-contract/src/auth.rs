@@ -1,4 +1,4 @@
-use crate::contract::GoodsContract;
+use crate::contract::DemandContract;
 use crate::error::Error;
 use soroban_sdk::{
     auth::{Context, CustomAccountInterface},
@@ -14,7 +14,7 @@ pub struct AccSignature {
     pub signature: BytesN<64>,
 }
 
-impl CustomAccountInterface for GoodsContract {
+impl CustomAccountInterface for DemandContract {
     type Signature = Vec<AccSignature>;
     type Error = Error;
 

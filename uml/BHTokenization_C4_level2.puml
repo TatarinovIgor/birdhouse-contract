@@ -1,0 +1,49 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Person(Buyer, "Buyer", "is an entity (individual or institution) that acquires product (services) on the base of demand specification")
+Person(Administrator, "Administrator", "is an entity responsible for BH Tokenization System configuration and management")
+Person(Seller, "Seller", "is the entity (individual or institution) that delivers a product or provides a service")
+
+System_Boundary(System, "BH Tokenization Platform") {
+    Container(SystemD, "Buyer Portal", "Online Demand System", "Allows buyer to explore product (service), create/manage demand, and make payments")
+    Container(SystemA, "BH admin portal", "Online Product System", "Allows Admin of the system to change and make system configurations")
+    Container(SystemS, "Seller Portal", "Online Service System", "Allows seller to explore demands, create/manage product (service), and make payouts")
+    Container(Tokenizer, "System Asset tokenization management", "Implementation of BH Tokenization protocol", "Provides interface for the smart contracts interaction and management of data in Assets Tokens")
+    ContainerDb(Registry, "User's registry", "Database", "Store information about linked product(services) or demand")
+
+    Rel(Buyer, SystemD,  "Uses")
+    Rel(Administrator, SystemA,  "Uses")
+    Rel(Seller, SystemS,  "Uses")
+    Rel(SystemA, Tokenizer,  "Manage")
+    Rel(SystemD, Tokenizer,  "Uses")
+    Rel(SystemS, Tokenizer,  "Uses")
+    Tokenizer -left->  Registry : "Uses"
+}
+
+System_Boundary(Anchor, "Stellar Anchor platform") {
+    Container_Ext(PaymentI, "SEP-0006", "sep-0001: TRANSFER_SERVER", "Deposit and Withdrawal API")
+    Container_Ext(PaymentO, "SEP-0024", "sep-0001: TRANSFER_SERVER_SEP0024", "Hosted Deposit and Withdrawal")
+    Container_Ext(Payment, "SEP-0031", "sep-0001: DIRECT_PAYMENT_SERVER", "Cross-Border Payments API")
+}
+
+System_Boundary(Soroban, "Stellar Soroban") {
+    Container_Ext(Product, "Product", "Soroban Smart Contract", "Smart contract to manage data in Product asset token")
+    Container_Ext(Demand, "Demand", "Soroban Smart Contract", "Smart contract to manage data in Demand asset token")
+    Container_Ext(PaymentT, "Payment", "Soroban Smart Contract", "Smart contract to manage data in Payment process for asset tokens")
+    Container_Ext(SorobanPersistentStore, "Soroban Persistent Store", "Soroban Persistent Store", "Soroban Smart Contract to store validated data after processing")
+    Product --> SorobanPersistentStore :  "Event for Data update"
+    Demand --> SorobanPersistentStore :  "Event for Data update"
+    PaymentT --> SorobanPersistentStore :  "Event for Data update"
+}
+
+Soroban .left.> Anchor: "Links"
+SystemD ---> Anchor :  "PayIn"
+SystemA ---> Anchor : "Manages"
+SystemS ---> Anchor :  "PayOut"
+Tokenizer -left-> Demand : "Uses"
+Tokenizer ---> Product :  "Uses"
+Tokenizer ---> PaymentT :  "Uses"
+
+
+@enduml
