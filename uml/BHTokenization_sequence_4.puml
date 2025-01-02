@@ -1,0 +1,33 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+actor "Seller" as Seller #red
+
+participant "Seller Portal" as SystemS
+
+participant "Stellar Horizon" as Stellar
+
+participant "BH Tokenization" as Tokenizer
+
+participant "Purchasing Assets Tokenization \nSmart Contract" as ContractP
+participant "Goods Assets Tokenization \nSmart Contract" as ContractG
+participant "Stellar Anchor platform" as Anchor
+
+note over Seller, Anchor #33FFFF: Payout Asset for Goods.
+autonumber 4.1
+Seller -> SystemS : Request payout for\nthe delivered Goods
+SystemS -> Tokenizer : Request payout for\nthe delivered Goods
+Tokenizer -> ContractG : Get TOML file
+Tokenizer --> Tokenizer : Get payout methods\nfrom TOML file
+Tokenizer --> SystemS : Payout methods link
+SystemS --> Seller : Redirect to payout\nmethods link
+Seller -> Anchor : Fill payout information
+Anchor -> Tokenizer : Inform about payout asset
+Tokenizer -> ContractP : Update Purchasing Asset\nwith payout information
+ContractP --> Tokenizer : Success
+Tokenizer -> Stellar : Send asset for payout
+Stellar --> Anchor : Asset received
+Anchor --> Seller : Payout
+@enduml

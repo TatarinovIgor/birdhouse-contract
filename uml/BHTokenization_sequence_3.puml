@@ -19,46 +19,7 @@ participant "Demand Assets Tokenization \nSmart Contract" as ContractD
 participant "Goods Assets Tokenization \nSmart Contract" as ContractG
 participant "Stellar Anchor platform" as Anchor
 
-note over Buyer, ContractD #AAFFAA: Create Demand by the Buyer.
 
-autonumber 1.1
-Buyer -> SystemD : Create Demand
-SystemD --> SystemD : Verify data
-alt verified
-autonumber 1.2.1
-SystemD -> Tokenizer : Register new Demand
-Tokenizer -> ContractD : Create new\nDemand Assets Token
-ContractD --> ContractD : Issue new Asset\nStore Demand data in\nSoroban persistent store
-ContractD --> Tokenizer : Demand Asset information Asset code, Asset issuer
-Tokenizer -> Registry : Register new Demand\nfor the Buyer
-Registry --> Tokenizer : Success
-Tokenizer --> SystemD : Demand Asset information
-SystemD --> Buyer : Success
-else incorrect data
-autonumber 1.2.2
-SystemD -> Buyer : Error notification
-end
-
-note over Seller, ContractD #AAFFFF: Create Goods by the Seller.
-autonumber 2.1
-Seller -> SystemS : Explorer available\ndemands
-SystemS -> Tokenizer : Fetch list of\navailable demands
-Tokenizer -> Registry : Fetch list of available\nDemand Assets Tokens
-Registry --> Tokenizer : List of available\nDemand Assets Tokens
-Tokenizer --> SystemS : List of available\nDemand Assets Tokens
-SystemS --> Seller : Show list of available\nDemand Assets Tokens
-Seller -> SystemS : Select demand\nto provide goods
-SystemS --> Seller : Show a form\nto create goods
-Seller -> SystemS : Create goods\nto meet the demand\nrequirements
-SystemS -> Tokenizer : Register new Goods
-Tokenizer -> ContractG : Create new\nDemand Assets Token
-ContractG --> ContractG : Issue new Asset\nStore Goods data in\nSoroban persistent store
-ContractG --> Tokenizer : Goods Asset information Asset code, Asset issuer
-Tokenizer -> Registry : Register new Goods\nfor the Seller
-Registry --> Tokenizer : Success
-Tokenizer --> Tokenizer : Link Goods Asset to\nBuyer's Demand
-Tokenizer --> SystemS : Goods Asset information
-SystemS --> Seller : Success
 note over Buyer, ContractD #AAFF33: Buy Goods for the Demand.
 autonumber 3.1
 Buyer -> SystemD : Get a list\nof Goods Assets linked\nwith Demand Assets
@@ -108,19 +69,5 @@ Tokenizer --> Tokenizer : Revert Purchasing\nAssets to Buyer\naccount
 Tokenizer --> SystemD : Success
 SystemD --> Buyer : Success
 end
-note over Buyer, ContractD #33FFFF: Payout Asset for Goods.
-autonumber 4.1
-Seller -> SystemS : Request payout for\nthe delivered Goods
-SystemS -> Tokenizer : Request payout for\nthe delivered Goods
-Tokenizer -> ContractG : Get TOML file
-Tokenizer --> Tokenizer : Get payout methods\nfrom TOML file
-Tokenizer --> SystemS : Payout methods link
-SystemS --> Seller : Redirect to payout\nmethods link
-Seller -> Anchor : Fill payout information
-Anchor -> Tokenizer : Inform about payout asset
-Tokenizer -> ContractP : Update Purchasing Asset with payout information
-ContractP --> Tokenizer : Success
-Tokenizer -> Stellar : Send asset for payout
-Stellar --> Anchor : Asset received
-Anchor --> Seller : Payout
+
 @enduml

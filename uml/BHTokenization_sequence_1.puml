@@ -1,0 +1,35 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+actor Buyer as Buyer #green
+
+participant "Buyer Portal" as SystemD
+
+participant "BH Tokenization" as Tokenizer
+participant "User's registry" as Registry
+
+participant "Demand Assets Tokenization \nSmart Contract" as ContractD
+
+note over Buyer, ContractD #AAFFAA: Create Demand by the Buyer.
+
+autonumber 1.1
+Buyer -> SystemD : Create Demand
+SystemD --> SystemD : Verify data
+alt verified
+autonumber 1.2.1
+SystemD -> Tokenizer : Register new Demand
+Tokenizer -> ContractD : Create new\nDemand Assets Token
+ContractD --> ContractD : Issue new Asset\nStore Demand data in\nSoroban persistent store
+ContractD --> Tokenizer : Demand Asset information Asset code, Asset issuer
+Tokenizer -> Registry : Register new Demand\nfor the Buyer
+Registry --> Tokenizer : Success
+Tokenizer --> SystemD : Demand Asset information
+SystemD --> Buyer : Success
+else incorrect data
+autonumber 1.2.2
+SystemD -> Buyer : Error notification
+end
+
+@enduml
