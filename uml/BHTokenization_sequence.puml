@@ -1,0 +1,126 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+actor Buyer as Buyer #green
+actor "Seller" as Seller #red
+
+participant "Buyer Portal" as SystemD
+participant "Seller Portal" as SystemS
+
+participant "Stellar Horizon" as Stellar
+
+participant "BH Tokenization" as Tokenizer
+participant "User's registry" as Registry
+
+participant "Purchasing Assets Tokenization \nSmart Contract" as ContractP
+participant "Demand Assets Tokenization \nSmart Contract" as ContractD
+participant "Goods Assets Tokenization \nSmart Contract" as ContractG
+participant "Stellar Anchor platform" as Anchor
+
+note over Buyer, ContractD #AAFFAA: Create Demand by the Buyer.
+
+autonumber 1.1
+Buyer -> SystemD : Create Demand
+SystemD --> SystemD : Verify data
+alt verified
+autonumber 1.2.1
+SystemD -> Tokenizer : Register new Demand
+Tokenizer -> ContractD : Create new\nDemand Assets Token
+ContractD --> ContractD : Issue new Asset\nStore Demand data in\nSoroban persistent store
+ContractD --> Tokenizer : Demand Asset information Asset code, Asset issuer
+Tokenizer -> Registry : Register new Demand\nfor the Buyer
+Registry --> Tokenizer : Success
+Tokenizer --> SystemD : Demand Asset information
+SystemD --> Buyer : Success
+else incorrect data
+autonumber 1.2.2
+SystemD -> Buyer : Error notification
+end
+
+note over Seller, ContractD #AAFFFF: Create Goods by the Seller.
+autonumber 2.1
+Seller -> SystemS : Explorer available\ndemands
+SystemS -> Tokenizer : Fetch list of\navailable demands
+Tokenizer -> Registry : Fetch list of available\nDemand Assets Tokens
+Registry --> Tokenizer : List of available\nDemand Assets Tokens
+Tokenizer --> SystemS : List of available\nDemand Assets Tokens
+SystemS --> Seller : Show list of available\nDemand Assets Tokens
+Seller -> SystemS : Select demand\nto provide goods
+SystemS --> Seller : Show a form\nto create goods
+Seller -> SystemS : Create goods\nto meet the demand\nrequirements
+SystemS -> Tokenizer : Register new Goods
+Tokenizer -> ContractG : Create new\nDemand Assets Token
+ContractG --> ContractG : Issue new Asset\nStore Goods data in\nSoroban persistent store
+ContractG --> Tokenizer : Goods Asset information Asset code, Asset issuer
+Tokenizer -> Registry : Register new Goods\nfor the Seller
+Registry --> Tokenizer : Success
+Tokenizer --> Tokenizer : Link Goods Asset to\nBuyer's Demand
+Tokenizer --> SystemD : Goods Asset information
+SystemD --> Buyer : Success
+note over Buyer, ContractD #AAFF33: Buy Goods for the Demand.
+autonumber 3.1
+Buyer -> SystemD : Get a list\nof Goods Assets linked\nwith Demand Assets
+SystemD -> Stellar : Fetch a list of\nGoods Assets\nlinked with\nDemand Assets
+Stellar --> SystemD : List of Goods Assets\nlinked with\nDemand Assets
+SystemD --> Buyer : Show List of\nGoods Assets\nlinked with\nDemand Assets
+Buyer -> SystemD : Select Goods to buy
+SystemD -> Tokenizer : Create Purchasing Asset\n to buy the goods
+Tokenizer -> ContractP : Create new Purchasing Asset\n to buy the goods
+ContractP --> ContractP : Issue new Asset\nStore purchasing data in\nSoroban persistent store
+ContractP --> Tokenizer : Purchasing Asset information Asset code, Asset issuer
+Tokenizer -> ContractD : Get linked TOML file
+ContractD --> Tokenizer : TOML file
+Tokenizer --> Tokenizer : Get payment methods\ninformation from linked\nTOML file
+Tokenizer --> SystemD : Purchasing Asset information Asset code, Asset issuer\npayment method link
+SystemD --> Buyer : Redirect to payment method
+Buyer -> Anchor : Fill payment information and process payment
+Anchor -> Stellar : Transfer Assets as a payment result
+Stellar -> Tokenizer : Asset received
+Tokenizer -> ContractP : Mint the Purchasing Assets Token with received amount
+ContractP -> ContractP : Update Purchasing Assets Token\nwith payment information
+ContractP --> Tokenizer : Success
+Tokenizer --> ContractP : Transfer Purchasing\nAssets Tokens\nto Seller
+ContractP --> ContractP : Transfer Purchasing\nAssets Tokens to Seller\nupdate Soroban persistent store\nwith transfer information
+Tokenizer --> SystemD : Success
+SystemD --> Buyer : Success
+Seller -> Buyer : Deliver Goods\nfor the Demand
+alt
+autonumber 3.25.1.1
+Buyer -> SystemD : Confirm Goods Delivery
+SystemD -> Tokenizer : Confirm Goods Delivery
+Tokenizer --> ContractP : Approve Transfer of Purchasing Assets Tokens
+ContractP --> ContractP : Swap Purchasing Assets Tokens to Payout Assets\nBurn Purchasing Assets Tokens
+ContractP --> Tokenizer : Success
+Tokenizer -> ContractG : Burn Goods Assets Tokens
+ContractG --> Tokenizer : Success
+Tokenizer -> ContractD : Burn Demand Asset Tokens
+ContractD --> Tokenizer : Success
+Tokenizer --> SystemD : Success
+SystemD --> Buyer : Success
+else
+autonumber 3.25.2.1
+Buyer -> SystemD : Fail of Goods Delivery
+SystemD -> Tokenizer : Fail of  Goods Delivery
+Tokenizer --> ContractP : Reject Transfer of Purchasing Assets Tokens
+Tokenizer --> Tokenizer : Revert Purchasing\nAssets to Buyer\naccount
+Tokenizer --> SystemD : Success
+SystemD --> Buyer : Success
+end
+note over Buyer, ContractD #33FFFF: Payout Asset for Goods.
+autonumber 4.1
+Seller -> SystemS : Request payout for\nthe delivered Goods
+SystemS -> Tokenizer : Request payout for\nthe delivered Goods
+Tokenizer -> ContractG : Get TOML file
+Tokenizer --> Tokenizer : Get payout methods\nfrom TOML file
+Tokenizer --> SystemS : Payout methods link
+SystemS --> Seller : Redirect to payout\nmethods link
+Seller -> Anchor : Fill payout information
+Anchor -> Tokenizer : Inform about payout asset
+Tokenizer -> ContractP : Update Purchasing Asset with payout information
+ContractP --> Tokenizer : Success
+Tokenizer -> Stellar : Send asset for payout
+Stellar --> Anchor : Asset received
+Anchor --> Seller : Payout
+@enduml

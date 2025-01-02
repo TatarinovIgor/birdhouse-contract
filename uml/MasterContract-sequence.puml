@@ -3,33 +3,33 @@
 
 autonumber
 
-actor Customer as Customer #green
-actor "AI Merchant" as Merchant #blue
-actor "Validator" as Validator #red
-participant "Payment Smart Contract" as Contract
-Customer -> Contract: Register as payer uuid with associated Stellar Public key
+actor Buyer as Buyer #green
+actor "BH Tokenization" as Merchant #blue
+actor "Seller" as Seller #red
+participant "Purchasing Assets Tokenization \nSmart Contract" as Contract
+Buyer -> Contract: Register as payer uuid with associated Stellar Public key
 Contract -> Contract: Save payer in\n Persistent store
-Contract --> Customer: Ok
-Customer -> Contract: Register a Demand by uuid
+Contract --> Buyer: Ok
+Buyer -> Contract: Register a Demand by uuid
 Contract -> Contract: Issue a new asset
 Contract -> Contract: Store Asset Information\n in Persistent store
-Contract --> Customer: Asset Information, asset code, issuer, smart contract
-Customer -> Contract: Mint asset as a payment conformation by payment uuid
+Contract --> Buyer: Asset Information, asset code, issuer, smart contract
+Buyer -> Contract: Mint asset as a payment conformation by payment uuid
 Contract -> Contract: Store payment information\n in persistent store
-Contract -->Customer: Payment Information
-Customer -> Contract: Transfer asset to AI Merchant\n for AI model execution by action uuid
-Contract -> Merchant: Send minted assets from Customer
+Contract -->Buyer: Payment Information
+Buyer -> Contract: Transfer asset to BH Tokenization\n to confirm goods purchasing by action uuid
+Contract -> Merchant: Send minted assets from Buyer
 Contract -> Contract: Store transfer information
-Contract --> Customer: Transfer information
-note over Contract, Customer #AAFFAA: Approve transfer\n in case of AI model\n execution success.
-Customer -> Contract: Approve Transfer
+Contract --> Buyer: Transfer information
+note over Contract, Buyer #AAFFAA: Approve transfer in case of Seller \nsuccessfully deliver the goods.
+Buyer -> Contract: Approve Transfer
 Contract -> Merchant: Swap minted assets\n to Payout Asset
-Merchant -> Validator: Transfer Payout Asset\n according validators fee
+Merchant -> Seller: Transfer Payout Asset\n according Sellers fee
 Contract -> Contract: Remove records from transfers\n by transfer uuid
 Contract -> Contract: Store payout information\n in Persistent store
-Contract --> Customer: Payout Information
-note over Contract, Customer #FFAAAA: Reject transfer\n in case of AI model\n execution fail.
-Customer -> Contract: Reject Transfer
-Contract -> Merchant: Recall minted assets\n to the Customer
-Contract --> Customer: Updated balance
+Contract --> Buyer: Payout Information
+note over Contract, Buyer #FFAAAA: Reject transfer in case of Seller \nfailed to deliver the goods.
+Buyer -> Contract: Reject Transfer
+Contract -> Merchant: Recall minted assets\n to the Buyer
+Contract --> Buyer: Updated balance
 @enduml
