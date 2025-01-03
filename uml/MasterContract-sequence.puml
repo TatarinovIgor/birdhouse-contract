@@ -14,10 +14,10 @@ Buyer -> Contract: Register a Demand by uuid
 Contract -> Contract: Issue a new asset
 Contract -> Contract: Store Asset Information\n in Persistent store
 Contract --> Buyer: Asset Information, asset code, issuer, smart contract
-Buyer -> Contract: Mint asset as a payment conformation by payment uuid
+Buyer -> Contract: Mint asset as a payment confirmation by payment uuid
 Contract -> Contract: Store payment information\n in persistent store
 Contract -->Buyer: Payment Information
-Buyer -> Contract: Transfer asset to BH Tokenization\n to confirm goods purchasing by action uuid
+Buyer -> Contract: Request to transfer asset to BH Tokenization\n to confirm goods purchasing by action uuid
 Contract -> Merchant: Send minted assets from Buyer
 Contract -> Contract: Store transfer information
 Contract --> Buyer: Transfer information

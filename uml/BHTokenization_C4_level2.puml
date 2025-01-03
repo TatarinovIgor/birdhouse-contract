@@ -9,13 +9,13 @@ System_Boundary(System, "BH Tokenization Platform") {
     Container(SystemD, "Buyer Portal", "Online Demand System", "Allows buyer to explore product (service), create/manage demand, and make payments")
     Container(SystemA, "BH admin portal", "Online Product System", "Allows Admin of the system to change and make system configurations")
     Container(SystemS, "Seller Portal", "Online Service System", "Allows seller to explore demands, create/manage product (service), and make payouts")
-    Container(Tokenizer, "System Asset tokenization management", "Implementation of BH Tokenization protocol", "Provides interface for the smart contracts interaction and management of data in Assets Tokens")
+    Container(Tokenizer, "System Asset tokenization management", "Implementation of BH Tokenization protocol", "Provides interface for the smart contracts interaction and management of data in Asset Tokens")
     ContainerDb(Registry, "User's registry", "Database", "Store information about linked product(services) or demand")
 
     Rel(Buyer, SystemD,  "Uses")
     Rel(Administrator, SystemA,  "Uses")
     Rel(Seller, SystemS,  "Uses")
-    Rel(SystemA, Tokenizer,  "Manage")
+    Rel(SystemA, Tokenizer,  "Manages")
     Rel(SystemD, Tokenizer,  "Uses")
     Rel(SystemS, Tokenizer,  "Uses")
     Tokenizer -left->  Registry : "Uses"
@@ -28,8 +28,8 @@ System_Boundary(Anchor, "Stellar Anchor platform") {
 }
 
 System_Boundary(Soroban, "Stellar Soroban") {
-    Container_Ext(Product, "Product", "Soroban Smart Contract", "Smart contract to manage data in Product asset token")
-    Container_Ext(Demand, "Demand", "Soroban Smart Contract", "Smart contract to manage data in Demand asset token")
+    Container_Ext(Product, "Product", "Soroban Smart Contract", "Smart contract to manage data in Product asset tokens")
+    Container_Ext(Demand, "Demand", "Soroban Smart Contract", "Smart contract to manage data in Demand asset tokens")
     Container_Ext(PaymentT, "Payment", "Soroban Smart Contract", "Smart contract to manage data in Payment process for asset tokens")
     Container_Ext(SorobanPersistentStore, "Soroban Persistent Store", "Soroban Persistent Store", "Soroban Smart Contract to store validated data after processing")
     Product --> SorobanPersistentStore :  "Event for Data update"

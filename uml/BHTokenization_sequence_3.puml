@@ -14,36 +14,36 @@ participant "Stellar Horizon" as Stellar
 participant "BH Tokenization" as Tokenizer
 participant "User's registry" as Registry
 
-participant "Purchasing Assets Tokenization \nSmart Contract" as ContractP
-participant "Demand Assets Tokenization \nSmart Contract" as ContractD
-participant "Goods Assets Tokenization \nSmart Contract" as ContractG
+participant "Purchasing Asset Tokenization \nSmart Contract" as ContractP
+participant "Demand Asset Tokenization \nSmart Contract" as ContractD
+participant "Goods Asset Tokenization \nSmart Contract" as ContractG
 participant "Stellar Anchor platform" as Anchor
 
 
 note over Buyer, ContractD #AAFF33: Buy Goods for the Demand.
 autonumber 3.1
-Buyer -> SystemD : Get a list\nof Goods Assets linked\nwith Demand Assets
-SystemD -> Stellar : Fetch a list of\nGoods Assets\nlinked with\nDemand Assets
-Stellar --> SystemD : List of Goods Assets\nlinked with\nDemand Assets
-SystemD --> Buyer : Show List of\nGoods Assets\nlinked with\nDemand Assets
+Buyer -> SystemD : Get a list\nof Goods Asset linked\nwith Demand Asset
+SystemD -> Stellar : Fetch a list of\nGoods Asset\nlinked with\nDemand Asset
+Stellar --> SystemD : Return list of Goods Asset\nlinked with\nDemand Asset
+SystemD --> Buyer : Show List of\nGoods Asset\nlinked with\nDemand Asset
 Buyer -> SystemD : Select Goods to buy
 SystemD -> Tokenizer : Create Purchasing Asset\n to buy the goods
 Tokenizer -> ContractP : Create new Purchasing Asset\n to buy the goods
 ContractP --> ContractP : Issue new Asset\nStore purchasing data in\nSoroban persistent store
 ContractP --> Tokenizer : Purchasing Asset information Asset code, Asset issuer
 Tokenizer -> ContractD : Get linked TOML file
-ContractD --> Tokenizer : TOML file
+ContractD --> Tokenizer : Return TOML file
 Tokenizer --> Tokenizer : Get payment methods\ninformation from linked\nTOML file
-Tokenizer --> SystemD : Purchasing Asset information Asset code, Asset issuer\npayment method link
+Tokenizer --> SystemD : Return Purchasing Asset information Asset code, Asset issuer\npayment method link
 SystemD --> Buyer : Redirect to payment method
 Buyer -> Anchor : Fill payment information and process payment
-Anchor -> Stellar : Transfer Assets as a payment result
+Anchor -> Stellar : Transfer Asset as a payment result
 Stellar -> Tokenizer : Asset received
-Tokenizer -> ContractP : Mint the Purchasing Assets Token with received amount
-ContractP -> ContractP : Update Purchasing Assets Token\nwith payment information
+Tokenizer -> ContractP : Mint the Purchasing Asset Token with received amount
+ContractP -> ContractP : Update Purchasing Asset Token\nwith payment information
 ContractP --> Tokenizer : Success
-Tokenizer --> ContractP : Transfer Purchasing\nAssets Tokens\nto Seller
-ContractP --> ContractP : Transfer Purchasing\nAssets Tokens to Seller\nupdate Soroban persistent store\nwith transfer information
+Tokenizer --> ContractP : Transfer Purchasing\nAsset Tokens\nto Seller
+ContractP --> ContractP : Transfer Purchasing\nAsset Tokens to Seller\nupdate Soroban persistent store\nwith transfer information
 Tokenizer --> SystemD : Success
 SystemD --> Buyer : Success
 Seller -> Buyer : Deliver Goods\nfor the Demand
@@ -51,10 +51,10 @@ alt
 autonumber 3.25.1.1
 Buyer -> SystemD : Confirm Goods Delivery
 SystemD -> Tokenizer : Confirm Goods Delivery
-Tokenizer --> ContractP : Approve Transfer of Purchasing Assets Tokens
-ContractP --> ContractP : Swap Purchasing Assets Tokens to Payout Assets\nBurn Purchasing Assets Tokens
+Tokenizer --> ContractP : Approve Transfer of Purchasing Asset Tokens
+ContractP --> ContractP : Swap Purchasing Asset Tokens to Payout Asset\nBurn Purchasing Asset Tokens
 ContractP --> Tokenizer : Success
-Tokenizer -> ContractG : Burn Goods Assets Tokens
+Tokenizer -> ContractG : Burn Goods Asset Tokens
 ContractG --> Tokenizer : Success
 Tokenizer -> ContractD : Burn Demand Asset Tokens
 ContractD --> Tokenizer : Success
@@ -64,8 +64,8 @@ else
 autonumber 3.25.2.1
 Buyer -> SystemD : Fail of Goods Delivery
 SystemD -> Tokenizer : Fail of  Goods Delivery
-Tokenizer --> ContractP : Reject Transfer of Purchasing Assets Tokens
-Tokenizer --> Tokenizer : Revert Purchasing\nAssets to Buyer\naccount
+Tokenizer --> ContractP : Reject Transfer of Purchasing Asset Tokens
+Tokenizer --> Tokenizer : Revert Purchasing\nAsset to Buyer\naccount
 Tokenizer --> SystemD : Success
 SystemD --> Buyer : Success
 end

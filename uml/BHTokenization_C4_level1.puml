@@ -4,8 +4,8 @@
 Person(Buyer, "Buyer", "is an entity (individual or institution) that acquires product (services) on the base of demand specification")
 Person(Administrator, "Administrator", "is an entity responsible for BH Tokenization System configuration and management")
 Person(Seller, "Seller", "is the entity (individual or institution) that delivers a product or provides a service")
-Container(SystemD, "BH Tokenization System", "Online Portal", "Allows to create Assets Tokens, explore available tokens, select asset tokens for purchasing and make payments")
-Container_Ext(Soroban, "Soroban", "Stellar Soroban", "Stellar Soroban smart contract to manage Assets Token")
+Container(SystemD, "BH Tokenization System", "Online Portal", "Allows to create Asset Tokens, explore available tokens, select asset tokens for purchasing and make payments")
+Container_Ext(Soroban, "Soroban", "Stellar Soroban", "Stellar Soroban smart contract to manage Asset Token")
 Container_Ext(Payment, "Payment Gateway", "Stellar Anchor platform", "Allows to pay-in and pay-out on the base of Stellar Anchor protocols SEP-006, SEP-0024, SEP-0031")
 
 Rel(Buyer, SystemD,  "Uses")

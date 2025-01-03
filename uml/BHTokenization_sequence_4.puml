@@ -11,8 +11,8 @@ participant "Stellar Horizon" as Stellar
 
 participant "BH Tokenization" as Tokenizer
 
-participant "Purchasing Assets Tokenization \nSmart Contract" as ContractP
-participant "Goods Assets Tokenization \nSmart Contract" as ContractG
+participant "Purchasing Asset Tokenization \nSmart Contract" as ContractP
+participant "Goods Asset Tokenization \nSmart Contract" as ContractG
 participant "Stellar Anchor platform" as Anchor
 
 note over Seller, Anchor #33FFFF: Payout Asset for Goods.
