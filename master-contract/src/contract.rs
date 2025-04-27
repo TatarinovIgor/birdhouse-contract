@@ -53,7 +53,7 @@ impl PaymentContract {
             issuer: admin,
         };
         e.storage().persistent().set(&PAY_ASSET, order_key);
-        e.storage().persistent().set(&LAST_BURN, &0);
+        e.storage().persistent().set(&LAST_BURN, &0u64);
 
         Ok(())
     }
