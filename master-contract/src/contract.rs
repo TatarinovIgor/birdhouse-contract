@@ -1,13 +1,14 @@
 use soroban_sdk::{contract, contractimpl, Address, BytesN, Env, EnvBase, String, Val};
 use crate::admin::Admin;
 use crate::burn::Burn;
+use crate::commission::Commission;
 use crate::deployer::Deployer;
 use crate::error::{Error};
 use crate::minting::Minter;
 use crate::payer::Payer;
 use crate::serialize_xdr::{CPAsset, CPWriteXdr};
 use crate::upgrade::UpgradeableContract;
-use crate::store::{OrderInfo, ADMIN, PAY_ASSET};
+use crate::store::{OrderInfo, ADMIN, LAST_BURN, PAY_ASSET};
 use crate::transfer::Transfer;
 
 #[contract]
@@ -15,12 +16,20 @@ pub struct PaymentContract;
 
 #[contractimpl]
 impl PaymentContract {
-
     /// Constructor requires Admin address and asset code for payout asset
+    ///  code must be aligned within stellar rules of asset names convention,
+    /// please check https://developers.stellar.org/docs/tokens/control-asset-access#naming-an-asset
+    /// and should be unique for admin address as an issuer of this asset
+    /// the length of asset code must be less than 6 symbols, but have at least one symbol
     pub fn __constructor(e: Env, admin: Address, pay_asset: String) {
         let _ = Self::init(e, admin, pay_asset).expect("can't initialize smart contract");
     }
+
     fn init(e: Env, admin: Address, pay_asset: String) -> Result<(), Error> {
+        let length = pay_asset.clone().len();
+        if  length > 5  && length < 1 {
+            return Err(Error::BadArgs);
+        }
         if e.storage().persistent().has(&ADMIN) {
             return Err(Error::AlreadyInitialized);
         }
@@ -44,6 +53,7 @@ impl PaymentContract {
             issuer: admin,
         };
         e.storage().persistent().set(&PAY_ASSET, order_key);
+        e.storage().persistent().set(&LAST_BURN, &0);
 
         Ok(())
     }
@@ -53,20 +63,28 @@ impl PaymentContract {
         Admin::admin(env)
     }
 
-    /// Set new admin address
+    /// Set a new admin address
     pub fn set_admin(env: Env, new_admin: Address) {
         Admin::set_admin(env, new_admin)
+    }
+
+    /// Get commission account address
+    pub fn commission_account(env: Env) -> Result<Address, Error> {
+        Commission::commission_account(env)
+    }
+
+    /// Set a new commission account address
+    pub fn set_commission_account(env: Env, commission_account: Address) {
+        Commission::set_commission_account(env, commission_account)
     }
 
     /// Issue asset for the order
     pub fn deploy(
         env: Env,
         order: String,
-        payer: String,
-        issuer: String,
-        prefix: String,
+        issuer: Address,
     ) -> (Address, String, Address) {
-        Deployer::deploy(env, order, payer, issuer, prefix)
+        Deployer::deploy(env, order, issuer)
     }
 
     /// Mint asset for the paid order
@@ -76,19 +94,22 @@ impl PaymentContract {
         payment: String,
         payer: String,
         amount: i128,
+        fee: i128,
     ) -> Result<(), Error> {
-        Minter::mint(env, order, payment, payer, amount)
+        Minter::mint(env, order, payment, payer, amount, fee)
     }
 
-    /// Transfer order asset as a payment to beneficiary
+    /// Transfer order asset as a payment to the beneficiary
     pub fn transfer(
         env: Env,
         order: String,
         transfer: String,
+        payer: String,
         beneficiary: String,
         amount: i128,
+        fee: i128,
     ) -> Result<(), Error> {
-        Transfer::transfer(env, order, transfer, beneficiary, amount)
+        Transfer::transfer(env, order, transfer, payer, beneficiary, amount, fee)
     }
 
     /// Approve order asset transfer
@@ -114,12 +135,20 @@ impl PaymentContract {
     /// Burn order asset
     pub fn burn(
         env: Env,
-        code: String,
-        issuer: Address,
+        from: String,
         payout: String,
         amount: i128,
+        fee: i128,
     ) -> Result<(), Error> {
-        Burn::burn(env, code, issuer, payout, amount)
+        Burn::burn(env, from, payout, amount, fee)
+    }
+
+    pub fn approve_burn(env: Env, payout: String) -> Result<(), Error> {
+        Burn::approve_burn(env, payout)
+    }
+
+    pub fn reject_burn(env: Env, payout: String) -> Result<(), Error> {
+        Burn::reject_burn(env, payout)
     }
 
     /// Get payer address by ID

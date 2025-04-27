@@ -1,7 +1,7 @@
 use soroban_sdk::{Env, String, Address, Val, EnvBase, Bytes};
 use soroban_sdk::unwrap::UnwrapOptimized;
 use crate::serialize_xdr::{CPAsset, CPWriteXdr};
-use crate::store::{AssetInfo, OrderInfo, StorageKey, ADMIN, LAST_ASSET};
+use crate::store::{get_pay_asset_info, AssetInfo, OrderInfo, StorageKey, ADMIN, LAST_ASSET};
 
 pub struct Deployer;
 
@@ -9,9 +9,7 @@ impl Deployer {
     pub fn deploy(
         env: Env,
         order: String,
-        payer: String,
-        issuer: String,
-        prefix: String,
+        issuer: Address
     ) -> (Address, String, Address) {
         let admin: Address = env.storage().persistent().get(&ADMIN).unwrap();
         admin.require_auth();
@@ -24,13 +22,14 @@ impl Deployer {
                 .get::<_, OrderInfo>(&StorageKey::Order(order.clone())).unwrap();
             return (order_from_store.contract, order_from_store.code, order_from_store.issuer);
         }
+        let pay_asset: OrderInfo = get_pay_asset_info(&env).unwrap();
 
         let symbols = Bytes::from_slice(
             &env, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".as_bytes());
 
         let last_code: &mut [u8; 12] = &mut [0u8; 12];
-        let prefix_len = prefix.len() as usize;
-        env.string_copy_to_slice(prefix.to_object(), Val::U32_ZERO,
+        let prefix_len = pay_asset.code.len() as usize;
+        env.string_copy_to_slice(pay_asset.code.to_object(), Val::U32_ZERO,
                                  last_code[..prefix_len].as_mut()).unwrap_optimized();
         let len: usize;
         let last_asset: String = env.storage().persistent()
@@ -52,10 +51,10 @@ impl Deployer {
             .unwrap_optimized();
 
         // Convert Symbol to String using the function
-        let asset = CPAsset { code: *last_code, issuer: issuer.clone() };
+        let asset = CPAsset { code: *last_code, issuer: issuer.clone().to_string() };
         let asset_serialized = asset.to_xdr(&env).unwrap();
 
-        // Deploy the contract using the uploaded Wasm with given hash.
+        // Deploy the contract using the uploaded Wasm with the given hash.
         let deployed_address = env
             .deployer()
             .with_stellar_asset(asset_serialized.clone())
@@ -71,7 +70,7 @@ impl Deployer {
         let order_key = &OrderInfo {
             contract: deployed_address.clone(),
             code: code_symbol.clone(),
-            issuer: Address::from_string(&issuer),
+            issuer,
         };
         env.storage().persistent().set(&StorageKey::Order(order.clone()), order_key);
 
@@ -86,7 +85,6 @@ impl Deployer {
         // store asset information
         let asset_key = &AssetInfo {
             order: order.clone(),
-            payer: Option::from(payer.clone()),
         };
 
         env.storage().persistent().set(&StorageKey::Asset(
